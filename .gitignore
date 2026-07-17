@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.egg-info/
+door_detection/
+runs/
+*.pcd
+*.pt
+*.pth

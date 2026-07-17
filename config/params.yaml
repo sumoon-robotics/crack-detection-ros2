@@ -1,0 +1,77 @@
+# params.yaml — crack_livo_fusion pipeline
+# Calibration sourced from:
+#   /mnt/ssd/fast_livo2_ros2_ws/src/FAST-LIVO2/config/camera_pinhole_mid360.yaml
+#   /mnt/ssd/fast_livo2_ros2_ws/src/FAST-LIVO2/config/mid360_hikrobot.yaml
+
+crack_seg:
+  ros__parameters:
+    repo_path: "/mnt/ssd/crack_segmentation"
+    ckpt_path: "/mnt/ssd/models/unet_vgg16_crack.pt"
+    device:    "cuda"
+    threshold: 0.55
+    publish_viz: true
+    inference_skip: 1
+
+crack_fusion:
+  ros__parameters:
+    # HIKrobot intrinsics — confirmed native publish res is 720x540
+    fx: 879.098
+    fy: 879.804
+    cx: 352.076
+    cy: 272.032
+    img_w: 720
+    img_h: 540
+
+    # Distortion (not yet applied in projection — see note in fusion node)
+    dist_k1: -0.122045
+    dist_k2:  0.117873
+    dist_p1: -0.000884
+    dist_p2: -0.001858
+
+    # T_lidar_cam from mid360_hikrobot.yaml Rcl/Pcl
+    T_lidar_cam: [
+      -0.002170, -0.999962,  0.008495,  0.034932,
+       0.362654, -0.008704, -0.931883, -0.040393,
+       0.931922,  0.001058,  0.362658, -0.037527,
+       0.0,       0.0,       0.0,       1.0
+    ]
+
+    mask_buffer_size: 8
+    max_range_m: 0.5
+    min_crack_points: 10
+
+crack_measure:
+  ros__parameters:
+    dbscan_eps: 0.015
+    dbscan_min_samples: 5
+    min_crack_length_m: 0.005
+
+door_seg:
+  ros__parameters:
+    ckpt_path: "/mnt/ssd/door_detection_repo/doors.pt"
+    device: "cuda"
+    conf_threshold: 0.55
+    publish_viz: true
+    inference_skip: 1
+
+door_measure:
+  ros__parameters:
+    fx: 879.098
+    fy: 879.804
+    cx: 352.076
+    cy: 272.032
+    img_w: 720
+    img_h: 540
+    T_lidar_cam: [
+      -0.002170, -0.999962,  0.008495,  0.034932,
+       0.362654, -0.008704, -0.931883, -0.040393,
+       0.931922,  0.001058,  0.362658, -0.037527,
+       0.0,       0.0,       0.0,       1.0
+    ]
+    detection_buffer_size: 6
+    min_points_for_measurement: 30
+    max_range_m: 5.0
+
+range_limited_cloud:
+  ros__parameters:
+    max_range_m: 1.5
